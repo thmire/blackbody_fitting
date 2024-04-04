@@ -182,7 +182,7 @@ class BB:
 
     def __init__(self,z,dist,observations_df,interped_df=pd.DataFrame(),
                  TNS_name="No name given",all_AB=None,
-                 extinction_file=None):
+                 extinction_file=None,path=None):
         
         if extinction_file :
             # Process the extinction file, taken from https://irsa.ipac.caltech.edu/applications/DUST/
@@ -306,6 +306,7 @@ class BB:
         self.zp_Jy = zp_Jy
         self.dist_factor=4*np.pi*((3.086e24*self.dist)**2)
         self.width = width
+        self.path = path
 
     def process_SED(self,epoch,tol=1,E_BV=None,plot=None,logplot=None,expdate=None):
         """
@@ -604,9 +605,17 @@ class BB:
         if opacity_table :
             print("using the opacity file...")
             opacity_files = {
-                   # "matern52": Matern52Kernel,
-                   # "matern32": Matern32Kernel,
-                    "basic": "/home/treynolds/data/Other_nuclear_transients/2019azh/modelling/kappa_abs_c.dat",
+                    "basic": self.path + "/opacity_files/kappa_abs_c.dat",
+                    "multiple_1":self.path + "/opacity_files/multiple_size/kappanu_abs_c1.dat",
+                    "multiple_0.5":self.path + "/opacity_files/multiple_size/kappanu_abs_c05.dat",
+                    "multiple_0.1":self.path + "/opacity_files/multiple_size/kappanu_abs_c01.dat",
+                    "multiple_0.05":self.path + "/opacity_files/multiple_size/kappanu_abs_c005.dat",
+                    "multiple_0.01":self.path + "/opacity_files/multiple_size/kappanu_abs_c001.dat",
+                    "single_1":self.path + "/opacity_files/single_size/kappanu_abs_c1.dat",
+                    "single_0.5":self.path + "/opacity_files/single_size/kappanu_abs_c05.dat",
+                    "single_0.1":self.path + "/opacity_files/single_size/kappanu_abs_c01.dat",
+                    "single_0.05":self.path + "/opacity_files/single_size/kappanu_abs_c005.dat",
+                    "single_0.01":self.path + "/opacity_files/single_size/kappanu_abs_c001.dat",
                     }
 
             valid_opacity_files = list(opacity_files.keys())
@@ -614,6 +623,7 @@ class BB:
             assert opacity_table in valid_opacity_files, err_message
             opacity_file_df = pd.read_csv(opacity_files[opacity_table],sep=" ",index_col=False,names=["frequency","opacity"])
             opacity_dict = get_opacities(wl,opacity_file_df,doprint=True)
+            self.opacity_df = opacity_file_df
             #assert kernel2 in valid_kernels, err_message
             if BB_count == 1:
                 sampler = emcee.EnsembleSampler(nwalkers, ndim, opacity_ln_likelihood, 
@@ -852,7 +862,7 @@ class BB:
         print("Mean acceptance fraction: {0:.3f}"
                         .format(np.mean(sampler.acceptance_fraction)))
         self.plotting_filepath = filepath
-        self.MCMC_inputs = (wl,fl,fl_err)
+        self.MCMC_inputs = (wl,fl,fl_err,fl_Jy,fl_Jy_err) 
         self.wl = wl
 
 # stuff for the MCMC
