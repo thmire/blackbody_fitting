@@ -1,7 +1,5 @@
 All opacities here are for graphite spherical dust
 
-The kappa_abs_c.dat file is graphite dust with the usual size distribution a^-3.5 and the maximum radius of 0.25um and the minimum of 0.005. 
-
 kappalam files are lambda [cm], kappa_abs [cm^2/g]
 kappanu files are nu [Hz], kappa_abs [cm^2/g]
 
@@ -19,5 +17,6 @@ The minimum size is always 0.005 um. The size distribution is a^-3.5. The maximu
 c001 is for graphite with the maximum size of 0.01 um
 c005 is for graphite with the maximum size of 0.05 um
 c01 is for graphite with the maximum size of 0.1 um
+c025 is for graphite with the maximum size of 0.25 um
 c05 is for graphite with the maximum size of 0.5 um
 c1 is for graphite with the maximum size of 1.0 um

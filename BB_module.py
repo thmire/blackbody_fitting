@@ -623,7 +623,7 @@ class BB:
         if opacity_table :
             print("using the opacity file...")
             opacity_files = {
-                    "basic": self.path + "/opacity_files/kappa_abs_c.dat",
+                    "multiple_0.25": self.path + "/opacity_files/multiple_size/kappanu_abs_c025.dat",
                     "multiple_1":self.path + "/opacity_files/multiple_size/kappanu_abs_c1.dat",
                     "multiple_0.5":self.path + "/opacity_files/multiple_size/kappanu_abs_c05.dat",
                     "multiple_0.1":self.path + "/opacity_files/multiple_size/kappanu_abs_c01.dat",
