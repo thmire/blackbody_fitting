@@ -429,21 +429,21 @@ class BB:
                 if logplot :
                     ax1.errorbar(self.wle[filt]/(1+self.z),np.log10(fl),yerr=fl_err/fl*np.log10(2.5),
 			xerr=self.width[filt]/2,capsize=5,capthick=1,
-			marker="o",markersize=10,label=filt,ls="")
+			marker="o",markersize=10,label=filt,ls="",mec="k")
                     ax2.errorbar(self.wle[filt]/(1+self.z),
                                  np.log10(fl_Jy),
                                  yerr=fl_Jy_err/fl_Jy*np.log10(2.5),
 			xerr=self.width[filt]/2,capsize=5,capthick=1,
-			marker="o",markersize=10,label=filt,ls="")
+			marker="o",markersize=10,label=filt,ls="",mec="k")
                 else :
                     ax1.errorbar(self.wle[filt]/(1+self.z),fl,yerr=fl_err,
                                 xerr=self.width[filt]/2,capsize=5,capthick=1,
-			marker="o",markersize=10,label=filt,ls="")
+			marker="o",markersize=10,label=filt,ls="",mec="k")
                     ax2.errorbar(self.wle[filt]/(1+self.z),
                                  fl_Jy,
                                  yerr=fl_Jy_err,
                                 xerr=self.width[filt]/2,capsize=5,capthick=1,
-			marker="o",markersize=10,label=filt,ls="")
+			marker="o",markersize=10,label=filt,ls="",mec="k")
 
 
                     
@@ -460,21 +460,21 @@ class BB:
                         if logplot :
                             ax1.errorbar(self.wle[filt]/(1+self.z),np.log10(fl),yerr=fl_err/fl*np.log10(2.5),
                                 xerr=self.width[filt]/2,capsize=5,capthick=1,
-                                marker="D",markersize=10,label=filt,ls="")
+                                marker="D",markersize=10,label=filt,ls="",mec="k")
                             ax2.errorbar(self.wle[filt]/(1+self.z),
                                          np.log10(fl_Jy),
                                          yerr=fl_Jy_err/fl_Jy*np.log10(2.5),
                                 xerr=self.width[filt]/2,capsize=5,capthick=1,
-                                marker="D",markersize=10,label=filt,ls="")
+                                marker="D",markersize=10,label=filt,ls="",mec="k")
                         else :
                             ax1.errorbar(self.wle[filt]/(1+self.z),fl,yerr=fl_err,
                                     xerr=self.width[filt]/2,capsize=5,capthick=1,
-                                    marker="D",markersize=10,label=filt,ls="")
+                                    marker="D",markersize=10,label=filt,ls="",mec="k")
                             ax2.errorbar(self.wle[filt]/(1+self.z),
                                          fl_Jy,
                                          yerr=fl_Jy_err,
                                     xerr=self.width[filt]/2,capsize=5,capthick=1,
-                                    marker="D",markersize=10,label=filt,ls="")
+                                    marker="D",markersize=10,label=filt,ls="",mec="k")
                 ax1.legend();ax2.legend()
 
                 
@@ -537,43 +537,60 @@ class BB:
             burnin = int(nsample * 0.5)
         filters = []; wl=[];fl=[];fl_err=[]; fl_Jy=[];fl_Jy_err=[]
         # might need to rewrite to deal with the nans
+        filters_exclude = []; wl_exclude=[];fl_exclude=[];fl_err_exclude=[]; fl_Jy_exclude=[];fl_Jy_err_exclude=[]
         
         bins = [epoch-self.tol, epoch+self.tol]
         groups = self.observed_SED_df.groupby(pd.cut(self.observed_SED_df.mjd, bins))
 
         for filtername in self.filters :
             if filtername in exclude_filters :
-                continue                
-            wl_val = self.wle[filtername]
-
-            try :
-                fl_val = groups.mean()[filtername+"_flux"].dropna().iloc[0]
-                fl_err_val = groups.mean()[filtername+"_flux_err"].dropna().iloc[0]
-                fl_Jy_val = groups.mean()[filtername+"_flux_Jy"].dropna().iloc[0]
-                fl_Jy_err_val =  groups.mean()[filtername+"_flux_Jy_err"].dropna().iloc[0]
+                wl_val = self.wle[filtername]
+                try :
+                    fl_val = groups.mean()[filtername+"_flux"].dropna().iloc[0]
+                    fl_err_val = groups.mean()[filtername+"_flux_err"].dropna().iloc[0]
+                    fl_Jy_val = groups.mean()[filtername+"_flux_Jy"].dropna().iloc[0]
+                    fl_Jy_err_val =  groups.mean()[filtername+"_flux_Jy_err"].dropna().iloc[0]
                 
-                wl.append(wl_val)
-                filters.append(filtername)
-                fl.append(fl_val)
-                fl_err.append(fl_err_val)
-                fl_Jy.append(fl_Jy_val)
-                fl_Jy_err.append(fl_Jy_err_val)
-                interp_flag = False
-            except :
-                print("failed for " + filtername)
-                interp_flag = True
-                
-            if interp_flag and interp:
-                if filtername in self.interped_filters :
-                    fl_val = self.interped_SED_df[filtername+"_flux"][self.interped_SED_df[filtername].dropna().index[0]]
-                    fl_err_val = self.interped_SED_df[filtername+"_flux_err"][self.interped_SED_df[filtername+"_err"].dropna().index[0]]
-                    fl_Jy_val = self.interped_SED_df[filtername+"_flux_Jy"][self.interped_SED_df[filtername].dropna().index[0]]
-                    fl_Jy_err_val =  self.interped_SED_df[filtername+"_flux_Jy_err"][self.interped_SED_df[filtername+"_err"].dropna().index[0]]
+                    wl_exclude.append(wl_val)
+                    filters_exclude.append(filtername)
+                    fl_exclude.append(fl_val)
+                    fl_err_exclude.append(fl_err_val)
+                    fl_Jy_exclude.append(fl_Jy_val)
+                    fl_Jy_err_exclude.append(fl_Jy_err_val)
+                    interp_flag = False
+                except :
+                    print("failed for " + filtername)
+                    interp_flag = True                
+            else :
+                wl_val = self.wle[filtername]
+                try :
+                    fl_val = groups.mean()[filtername+"_flux"].dropna().iloc[0]
+                    fl_err_val = groups.mean()[filtername+"_flux_err"].dropna().iloc[0]
+                    fl_Jy_val = groups.mean()[filtername+"_flux_Jy"].dropna().iloc[0]
+                    fl_Jy_err_val =  groups.mean()[filtername+"_flux_Jy_err"].dropna().iloc[0]
+                    
                     wl.append(wl_val)
+                    filters.append(filtername)
                     fl.append(fl_val)
                     fl_err.append(fl_err_val)
                     fl_Jy.append(fl_Jy_val)
                     fl_Jy_err.append(fl_Jy_err_val)
+                    interp_flag = False
+                except :
+                    print("failed for " + filtername)
+                    interp_flag = True
+                    
+                if interp_flag and interp:
+                    if filtername in self.interped_filters :
+                        fl_val = self.interped_SED_df[filtername+"_flux"][self.interped_SED_df[filtername].dropna().index[0]]
+                        fl_err_val = self.interped_SED_df[filtername+"_flux_err"][self.interped_SED_df[filtername+"_err"].dropna().index[0]]
+                        fl_Jy_val = self.interped_SED_df[filtername+"_flux_Jy"][self.interped_SED_df[filtername].dropna().index[0]]
+                        fl_Jy_err_val =  self.interped_SED_df[filtername+"_flux_Jy_err"][self.interped_SED_df[filtername+"_err"].dropna().index[0]]
+                        wl.append(wl_val)
+                        fl.append(fl_val)
+                        fl_err.append(fl_err_val)
+                        fl_Jy.append(fl_Jy_val)
+                        fl_Jy_err.append(fl_Jy_err_val)
 
         if interp:
             for filtername in self.interped_filters :
@@ -595,6 +612,7 @@ class BB:
 
         #convert to rest frame
         wl = np.array(wl) /(1+self.z)
+        wl_exclude = np.array(wl_exclude) /(1+self.z)
         c = 2.99792458E8
         freq = c / (wl * 1E-10)
         print(filters, wl, fl, fl_err, fl_Jy, fl_Jy_err, scale,temp,dist)
@@ -782,10 +800,14 @@ class BB:
 
             if opacity_table :
                 if plot_Jy :
+                    print(self.BB_results,wl,np.array(fl_Jy)*dist_scale,np.array(fl_Jy_err)*dist_scale)
                     ax = bestplot_opacity_2(
                                 self.BB_results,wl,np.array(fl_Jy)*dist_scale,np.array(fl_Jy_err)*dist_scale,
                                 phase=self.phase,save_loc=save_loc,dist_factor=self.dist_factor,
             			log=log,opacity_df=opacity_file_df,
+                                excluded_wl=wl_exclude,
+                                excluded_flux=np.array(fl_Jy_exclude)*dist_scale,
+                                excluded_flux_err=np.array(fl_Jy_err_exclude)*dist_scale,
             			)    
 
             elif not modified :
@@ -878,7 +900,8 @@ def get_opacities(wav,opacity_file_df,doprint=None):
     return opacities_dict 
         
 
-def bestplot_opacity_2(results,wl,flux,flux_err,phase,save_loc=None,dist_factor=1,log=None,opacity_df=None):      
+def bestplot_opacity_2(results,wl,flux,flux_err,phase,save_loc=None,dist_factor=1,log=None,opacity_df=None,
+                        excluded_wl=np.array([]),excluded_flux=None,excluded_flux_err=None):      
     plt.clf()
     c  = const.c
 
@@ -891,8 +914,11 @@ def bestplot_opacity_2(results,wl,flux,flux_err,phase,save_loc=None,dist_factor=
     ax1 = fig.add_subplot(1, 1, 1)  # create an axes object in the figure 
 
     ax1.errorbar(wl,np.array(flux)/dist_factor, np.array(flux_err)/dist_factor,
-                 linestyle='',marker = 'o',color = 'xkcd:red', label='Data')
-
+                 linestyle='',marker = 'o',color = 'xkcd:red', label='Data',mec="k")
+    if excluded_wl.any() :
+        ax1.errorbar(excluded_wl,np.array(excluded_flux)/dist_factor, np.array(excluded_flux_err)/dist_factor,
+                 linestyle='',marker = 'o',color = 'xkcd:blue', label='Excluded data',mec="k")
+    
     x = np.linspace(np.min(wl),np.max(wl),1000)
     y = []
     for item in x :
